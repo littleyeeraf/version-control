@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  # Postgres database.
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: yeeraf
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: kontrol
+    ports:
+      - 5432:5432 # machine_port:container_port
+
+  # Web UI to interact with databases.
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DESIGN: dracula
+    ports:
+      - 3333:8080
