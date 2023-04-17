@@ -24,9 +24,9 @@ export default function NewContent() {
               <input id="title" type="text" className="p-1 rounded-sm" />
             </div>
             <div className="mb-2">
-              <label htmlFor="desc">Description</label>
+              <label htmlFor="body">Body</label>
               <br />
-              <textarea id="desc" className="p-1 rounded-sm"></textarea>
+              <textarea id="body" className="p-1 rounded-sm"></textarea>
             </div>
             <div className="flex content-center">
               <button
