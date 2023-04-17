@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 
-export default function NewContent() {
+export default function NewContent(): JSX.Element {
   return (
     <>
       <Head>
