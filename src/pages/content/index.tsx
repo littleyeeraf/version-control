@@ -1,7 +1,16 @@
 import Head from "next/head";
 import Link from "next/link";
+import useSwr from "swr";
+
+import { Content } from "../api/contents";
+
+async function fetcher(url: string) {
+  return fetch(url).then((res) => res.json());
+}
 
 export default function Content(): JSX.Element {
+  const { data } = useSwr<Content[]>("/api/contents", fetcher);
+
   return (
     <>
       <Head>
@@ -16,9 +25,31 @@ export default function Content(): JSX.Element {
             🦄
           </Link>
         </div>
-        <div>
+        <div className="mb-6">
           <h2 className="text-3xl">All Contents</h2>
           <p className="text-gray-400">These are awesome!</p>
+        </div>
+        {data && (
+          <div className="mb-6 w-96">
+            <ul>
+              {data.map((content) => (
+                <li key={content.title} className="mb-2 last:mb-0">
+                  <div className="rounded-md p-4 bg-gray-700">
+                    <h2 className="text-3xl">{content.title}</h2>
+                    <p className="text-gray-400">{content.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div>
+          <Link
+            href="/content/new"
+            className="text-blue-400 hover:text-blue-300"
+          >
+            Create a new content
+          </Link>
         </div>
       </main>
     </>
