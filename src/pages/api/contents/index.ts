@@ -7,7 +7,7 @@ async function createContent(title: string, body: string) {
 }
 
 async function getContent() {
-  return await prisma.contents.findMany();
+  return await prisma.contents.findMany({ orderBy: { id: "asc" } });
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
