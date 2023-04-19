@@ -1,34 +1,33 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export type Content = {
-  title: string;
-  body: string;
-};
+import prisma from "@/lib/prisma";
 
-export const contents: Content[] = [
-  { title: "First", body: "May the force be with you" },
-  { title: "Second", body: "Cupidatat ea veniam esse" },
-];
+async function createContent(title: string, body: string) {
+  return await prisma.contents.create({ data: { title: title, body: body } });
+}
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+async function getContent() {
+  return await prisma.contents.findMany();
+}
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
     case "GET":
+      const contents = await getContent();
+      console.log(contents);
       res.status(200).json(contents);
       break;
     case "POST":
-      try {
-        const { title, body }: Content = req.body;
-        contents.push({ title, body });
-        res.status(201).json(title);
-      } catch (err) {
-        console.error(err);
-        res.status(400).end("Bad request");
-      }
+      const { title, body } = req.body;
+      const content = await createContent(title, body);
+      res.status(201).json(content);
       break;
     default:
       res.setHeader("Allow", ["GET", "POST"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 }
+
+export default handler;

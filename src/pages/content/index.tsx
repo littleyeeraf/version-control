@@ -2,14 +2,14 @@ import Head from "next/head";
 import Link from "next/link";
 import useSwr from "swr";
 
-import { Content } from "../api/contents";
+import { Contents } from "@prisma/client";
 
 async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
-export default function Content(): JSX.Element {
-  const { data } = useSwr<Content[]>("/api/contents", fetcher);
+function Content(): JSX.Element {
+  const { data } = useSwr<Contents[]>("/api/contents", fetcher);
 
   return (
     <>
@@ -55,3 +55,5 @@ export default function Content(): JSX.Element {
     </>
   );
 }
+
+export default Content;
