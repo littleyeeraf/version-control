@@ -13,7 +13,7 @@ function Content(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Kontrol! - Content</title>
+        <title>Kontrol! - All Contents</title>
         <meta name="description" content="Created by Yee" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
