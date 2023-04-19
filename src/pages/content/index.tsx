@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import useSwr from "swr";
 import { Contents } from "@prisma/client";
 
@@ -7,8 +8,13 @@ async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
-function Content(): JSX.Element {
+function AllContent(): JSX.Element {
+  const router = useRouter();
   const { data } = useSwr<Contents[]>("/api/contents", fetcher);
+
+  const handleClick = (id: number) => {
+    router.push(`/content/${id}`);
+  };
 
   return (
     <>
@@ -32,8 +38,11 @@ function Content(): JSX.Element {
           <div className="mb-6 w-96">
             <ul>
               {data.map((content) => (
-                <li key={content.title} className="mb-2 last:mb-0">
-                  <div className="rounded-md p-4 bg-gray-700">
+                <li key={content.id} className="mb-2 last:mb-0">
+                  <div
+                    onClick={() => handleClick(content.id)}
+                    className="rounded-md p-4 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
+                  >
                     <h2 className="text-3xl">{content.title}</h2>
                     <p className="text-gray-400">{content.body}</p>
                   </div>
@@ -55,4 +64,4 @@ function Content(): JSX.Element {
   );
 }
 
-export default Content;
+export default AllContent;
