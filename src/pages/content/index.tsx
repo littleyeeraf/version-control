@@ -1,7 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
 import useSwr from "swr";
-
 import { Contents } from "@prisma/client";
 
 async function fetcher(url: string) {
