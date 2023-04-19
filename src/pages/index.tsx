@@ -10,7 +10,7 @@ function Home(): JSX.Element {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex flex-col items-center p-6">
+      <main className="flex flex-col items-center p-8">
         <div className="mb-4">
           <h1 className="text-4xl">WRITTEN IN TS 💙</h1>
         </div>

@@ -27,8 +27,8 @@ function NewContent(): JSX.Element {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="relative flex flex-col items-center p-6">
-        <div className="absolute top-6 right-6 text-3xl">
+      <main className="relative flex flex-col items-center p-8">
+        <div className="absolute top-8 right-8 text-3xl">
           <Link href="/" className="cursor-pointer">
             🦄
           </Link>
