@@ -4,8 +4,6 @@ connect-db:
 dashboard:
 	npx prisma studio
 
-generate:
-	npx prisma generate
-
 migrate:
 	npx prisma db push
+	npx prisma generate
