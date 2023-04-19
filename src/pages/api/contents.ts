@@ -16,7 +16,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case "GET":
       const contents = await getContent();
-      console.log(contents);
       res.status(200).json(contents);
       break;
     case "POST":
