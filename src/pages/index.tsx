@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 
-export default function Home(): JSX.Element {
+function Home(): JSX.Element {
   return (
     <>
       <Head>
@@ -32,3 +32,5 @@ export default function Home(): JSX.Element {
     </>
   );
 }
+
+export default Home;

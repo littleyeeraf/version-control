@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FormEvent, useRef } from "react";
 import axios from "axios";
 
-export default function NewContent(): JSX.Element {
+function NewContent(): JSX.Element {
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
 
@@ -76,3 +76,5 @@ export default function NewContent(): JSX.Element {
     </>
   );
 }
+
+export default NewContent;
