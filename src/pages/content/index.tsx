@@ -1,4 +1,3 @@
-import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,7 +8,7 @@ async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
-function AllContent({ unixTime }: { unixTime: number }): JSX.Element {
+function AllContent(): JSX.Element {
   const router = useRouter();
   const { data } = useSwr<Contents[]>("/api/contents", fetcher);
 
@@ -38,22 +37,17 @@ function AllContent({ unixTime }: { unixTime: number }): JSX.Element {
         {data && (
           <div className="mb-6 w-96">
             <ul>
-              {data
-                .filter(
-                  (content) =>
-                    new Date(content.publishedAt).getTime() <= unixTime
-                )
-                .map((content) => (
-                  <li key={content.id} className="mb-2 last:mb-0">
-                    <div
-                      onClick={() => handleClick(content.id)}
-                      className="rounded-md p-4 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
-                    >
-                      <h2 className="text-3xl">{content.title}</h2>
-                      <p className="text-gray-400">{content.body}</p>
-                    </div>
-                  </li>
-                ))}
+              {data.map((content) => (
+                <li key={content.id} className="mb-2 last:mb-0">
+                  <div
+                    onClick={() => handleClick(content.id)}
+                    className="rounded-md p-4 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
+                  >
+                    <h2 className="text-3xl">{content.title}</h2>
+                    <p className="text-gray-400">{content.body}</p>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         )}
@@ -69,15 +63,5 @@ function AllContent({ unixTime }: { unixTime: number }): JSX.Element {
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const unixTime = new Date().getTime();
-
-  return {
-    props: {
-      unixTime,
-    },
-  };
-};
 
 export default AllContent;

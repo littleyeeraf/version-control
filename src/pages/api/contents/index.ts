@@ -9,7 +9,10 @@ async function createContent(title: string, body: string, publishedAt: Date) {
 }
 
 async function getContent() {
-  return await prisma.contents.findMany({ orderBy: { id: "asc" } });
+  return await prisma.contents.findMany({
+    where: { publishedAt: { lte: new Date() } },
+    orderBy: { id: "asc" },
+  });
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
