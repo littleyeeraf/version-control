@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { FormEvent, useRef } from "react";
+import { FormEvent, useState, useRef } from "react";
 import useSwr from "swr";
 import axios from "axios";
 import { Contents } from "@prisma/client";
@@ -14,6 +14,8 @@ function Content({ id }: { id: string }): JSX.Element {
   const { data } = useSwr<Contents>(`/api/contents/${id}`, fetcher);
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const datetimeRef = useRef<HTMLInputElement>(null);
+  const [checked, setChecked] = useState<boolean>(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault;
@@ -23,6 +25,9 @@ function Content({ id }: { id: string }): JSX.Element {
       .put(`/api/contents/${id}`, {
         title: titleRef.current.value,
         body: bodyRef.current.value,
+        publishedAt: datetimeRef.current?.value
+          ? new Date(datetimeRef.current.value)
+          : new Date(),
       })
       .catch((err) => console.error(err));
   };
@@ -48,9 +53,9 @@ function Content({ id }: { id: string }): JSX.Element {
                 <label htmlFor="title">Title</label>
                 <br />
                 <input
+                  ref={titleRef}
                   id="title"
                   type="text"
-                  ref={titleRef}
                   defaultValue={data.title}
                   autoComplete="off"
                   required
@@ -61,12 +66,31 @@ function Content({ id }: { id: string }): JSX.Element {
                 <label htmlFor="body">Body</label>
                 <br />
                 <textarea
-                  id="body"
                   ref={bodyRef}
+                  id="body"
                   defaultValue={data.body}
                   required
                   className="p-1 rounded-sm w-full"
                 ></textarea>
+              </div>
+              <div className="mb-2">
+                <input
+                  id="schedule-checkbox"
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => setChecked(!checked)}
+                  className="mr-2 hover:cursor-pointer"
+                />
+                <label htmlFor="schedule-checkbox">Schedule Publish</label>
+              </div>
+              <div className="mb-2">
+                <input
+                  ref={datetimeRef}
+                  type="datetime-local"
+                  disabled={!checked}
+                  required
+                  className="p-1 rounded-sm w-full disabled:cursor-not-allowed"
+                />
               </div>
               <div className="flex content-center">
                 <button

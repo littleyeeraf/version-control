@@ -6,10 +6,15 @@ async function getContentByID(id: number) {
   return await prisma.contents.findUnique({ where: { id: id } });
 }
 
-async function updateContent(id: number, title: string, body: string) {
+async function updateContent(
+  id: number,
+  title: string,
+  body: string,
+  publishedAt: Date
+) {
   return await prisma.contents.update({
     where: { id: id },
-    data: { title: title, body: body },
+    data: { title: title, body: body, publishedAt: publishedAt },
   });
 }
 
@@ -23,8 +28,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(200).json(content);
       break;
     case "PUT":
-      const { title, body } = req.body;
-      const uContent = await updateContent(id, title, body);
+      const { title, body, publishedAt } = req.body;
+      const uContent = await updateContent(id, title, body, publishedAt);
       res.status(200).json(uContent);
       break;
     default:
