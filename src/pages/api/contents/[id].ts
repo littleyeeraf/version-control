@@ -25,7 +25,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case "GET":
       const content = await getContentByID(id);
-      res.status(200).json(content);
+      content
+        ? res.status(200).json(content)
+        : res.status(404).end(`Not Found`);
       break;
     case "PUT":
       const { title, body, publishedAt } = req.body;
