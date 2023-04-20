@@ -13,13 +13,12 @@ function NewContent(): JSX.Element {
     e.preventDefault;
 
     if (!titleRef.current || !bodyRef.current) return;
+    const datetime = datetimeRef.current?.value;
     axios
       .post("/api/contents", {
         title: titleRef.current.value,
         body: bodyRef.current.value,
-        publishedAt: datetimeRef.current?.value
-          ? new Date(datetimeRef.current.value)
-          : new Date(),
+        publishedAt: datetime ? new Date(datetime) : new Date(),
       })
       .catch((err) => console.error(err));
   };
