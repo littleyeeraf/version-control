@@ -1,7 +1,8 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { FormEvent, useState, useRef } from "react";
+import { useRouter } from "next/router";
+import { FormEvent, useState, useRef, useEffect } from "react";
 import useSwr from "swr";
 import axios from "axios";
 import { Contents } from "@prisma/client";
@@ -10,7 +11,14 @@ async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
-function Content({ id }: { id: string }): JSX.Element {
+function Content({
+  id,
+  unixTime,
+}: {
+  id: string;
+  unixTime: number;
+}): JSX.Element {
+  const router = useRouter();
   const { data } = useSwr<Contents>(`/api/contents/${id}`, fetcher);
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -30,6 +38,13 @@ function Content({ id }: { id: string }): JSX.Element {
       })
       .catch((err) => console.error(err));
   };
+
+  useEffect(() => {
+    if (!data) return;
+    if (new Date(data.publishedAt).getTime() > unixTime) {
+      router.push("/content");
+    }
+  });
 
   return (
     <>
@@ -114,9 +129,12 @@ function Content({ id }: { id: string }): JSX.Element {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
+  const unixTime = new Date().getTime();
+
   return {
     props: {
       id,
+      unixTime,
     },
   };
 };
