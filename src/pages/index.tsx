@@ -12,7 +12,7 @@ function Home(): JSX.Element {
       </Head>
       <main className="flex flex-col items-center p-8">
         <div className="mb-4">
-          <h1 className="text-4xl">WRITTEN IN TS 💙</h1>
+          <h1 className="text-4xl">🦒 Yeeraf 💛</h1>
         </div>
         <div>
           <ul className="list-disc text-blue-400">
