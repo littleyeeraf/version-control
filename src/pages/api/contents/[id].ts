@@ -3,7 +3,15 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 
 async function getContentByID(id: number) {
-  return await prisma.contents.findUnique({ where: { id: id } });
+  return await prisma.contents.findUnique({
+    where: { id: id },
+    include: {
+      versions: {
+        where: { publishedAt: { lte: new Date() } },
+        orderBy: { id: "desc" },
+      },
+    },
+  });
 }
 
 async function updateContent(
@@ -14,7 +22,11 @@ async function updateContent(
 ) {
   return await prisma.contents.update({
     where: { id: id },
-    data: { title: title, body: body, publishedAt: publishedAt },
+    data: {
+      versions: {
+        create: [{ title: title, body: body, publishedAt: publishedAt }],
+      },
+    },
   });
 }
 

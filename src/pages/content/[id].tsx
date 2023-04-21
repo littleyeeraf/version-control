@@ -5,21 +5,18 @@ import { useRouter } from "next/router";
 import { FormEvent, useState, useRef, useEffect } from "react";
 import useSwr from "swr";
 import axios from "axios";
-import { Contents } from "@prisma/client";
+import { Contents, ContentVersions } from "@prisma/client";
 
 async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
-function Content({
-  id,
-  unixTime,
-}: {
-  id: string;
-  unixTime: number;
-}): JSX.Element {
+function Content({ id }: { id: string }): JSX.Element {
   const router = useRouter();
-  const { data } = useSwr<Contents>(`/api/contents/${id}`, fetcher);
+  const { data } = useSwr<Contents & { versions: ContentVersions[] }>(
+    `/api/contents/${id}`,
+    fetcher
+  );
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const datetimeRef = useRef<HTMLInputElement>(null);
@@ -40,8 +37,7 @@ function Content({
   };
 
   useEffect(() => {
-    if (!data) return;
-    if (new Date(data.publishedAt).getTime() > unixTime) {
+    if (data && data.versions.length === 0) {
       router.push("/content");
     }
   });
@@ -70,7 +66,7 @@ function Content({
                   ref={titleRef}
                   id="title"
                   type="text"
-                  defaultValue={data.title}
+                  defaultValue={data.versions[0]?.title}
                   autoComplete="off"
                   required
                   className="p-1 rounded-sm w-full"
@@ -82,7 +78,7 @@ function Content({
                 <textarea
                   ref={bodyRef}
                   id="body"
-                  defaultValue={data.body}
+                  defaultValue={data.versions[0]?.body}
                   required
                   className="p-1 rounded-sm w-full"
                 ></textarea>
@@ -129,12 +125,10 @@ function Content({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
-  const unixTime = new Date().getTime();
 
   return {
     props: {
       id,
-      unixTime,
     },
   };
 };

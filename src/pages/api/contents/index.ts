@@ -4,13 +4,23 @@ import prisma from "@/lib/prisma";
 
 async function createContent(title: string, body: string, publishedAt: Date) {
   return await prisma.contents.create({
-    data: { title: title, body: body, publishedAt: publishedAt },
+    data: {
+      versions: {
+        create: [{ title: title, body: body, publishedAt: publishedAt }],
+      },
+    },
   });
 }
 
 async function getContent() {
   return await prisma.contents.findMany({
-    where: { publishedAt: { lte: new Date() } },
+    include: {
+      versions: {
+        where: { publishedAt: { lte: new Date() } },
+        orderBy: { id: "desc" },
+        take: 1,
+      },
+    },
     orderBy: { id: "asc" },
   });
 }

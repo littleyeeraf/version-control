@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useSwr from "swr";
-import { Contents } from "@prisma/client";
+import { Contents, ContentVersions } from "@prisma/client";
 
 async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
@@ -10,7 +10,10 @@ async function fetcher(url: string) {
 
 function AllContent(): JSX.Element {
   const router = useRouter();
-  const { data } = useSwr<Contents[]>("/api/contents", fetcher);
+  const { data } = useSwr<(Contents & { versions: ContentVersions[] })[]>(
+    "/api/contents",
+    fetcher
+  );
 
   const handleClick = (id: number) => {
     router.push(`/content/${id}`);
@@ -34,20 +37,24 @@ function AllContent(): JSX.Element {
           <h2 className="text-3xl">All Contents</h2>
           <p className="text-gray-400">These are awesome!</p>
         </div>
-        {data && (
+        {data && data[0]?.versions.length > 0 && (
           <div className="mb-6 w-96">
             <ul>
-              {data.map((content) => (
-                <li key={content.id} className="mb-2 last:mb-0">
-                  <div
-                    onClick={() => handleClick(content.id)}
-                    className="rounded-md p-4 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
-                  >
-                    <h2 className="text-3xl">{content.title}</h2>
-                    <p className="text-gray-400">{content.body}</p>
-                  </div>
-                </li>
-              ))}
+              {data
+                .filter((content) => content.versions[0])
+                .map((content) => (
+                  <li key={content.id} className="mb-2 last:mb-0">
+                    <div
+                      onClick={() => handleClick(content.id)}
+                      className="rounded-md p-4 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
+                    >
+                      <h2 className="text-3xl">{content.versions[0].title}</h2>
+                      <p className="text-gray-400">
+                        {content.versions[0].body}
+                      </p>
+                    </div>
+                  </li>
+                ))}
             </ul>
           </div>
         )}
