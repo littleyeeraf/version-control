@@ -8,7 +8,14 @@ datasource db {
 }
 
 model Contents {
+  id                Int               @id @default(autoincrement())
+  versions          ContentVersions[]
+}
+
+model ContentVersions {
   id          Int      @id @default(autoincrement())
+  content     Contents @relation(fields: [contentId], references: [id])
+  contentId   Int
   title       String   @db.VarChar(255)
   body        String
   publishedAt DateTime @default(now())
