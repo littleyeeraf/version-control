@@ -32,12 +32,12 @@ function NewContent(): JSX.Element {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="relative flex flex-col items-center p-8">
-        <div className="absolute top-8 right-8 text-3xl">
+        <div className="absolute right-8 top-8 text-3xl">
           <Link href="/" className="cursor-pointer">
             🦄
           </Link>
         </div>
-        <div className="w-96 mb-6">
+        <div className="mb-6 w-96">
           <form onSubmit={handleSubmit}>
             <div className="mb-2">
               <label htmlFor="title">Title</label>
@@ -48,7 +48,7 @@ function NewContent(): JSX.Element {
                 type="text"
                 autoComplete="off"
                 required
-                className="p-1 rounded-sm w-full"
+                className="w-full rounded-sm p-1"
               />
             </div>
             <div className="mb-2">
@@ -58,7 +58,7 @@ function NewContent(): JSX.Element {
                 ref={bodyRef}
                 id="body"
                 required
-                className="p-1 rounded-sm w-full"
+                className="w-full rounded-sm p-1"
               ></textarea>
             </div>
             <div className="mb-2">
@@ -77,13 +77,13 @@ function NewContent(): JSX.Element {
                 type="datetime-local"
                 disabled={!checked}
                 required
-                className="p-1 rounded-sm w-full disabled:cursor-not-allowed"
+                className="w-full rounded-sm p-1 disabled:cursor-not-allowed"
               />
             </div>
             <div className="flex content-center">
               <button
                 type="submit"
-                className="p-1 w-full rounded-sm bg-gray-700 hover:bg-gray-600"
+                className="w-full rounded-sm bg-gray-700 p-1 hover:bg-gray-600"
               >
                 Publish
               </button>

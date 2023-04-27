@@ -28,7 +28,7 @@ function AllContent(): JSX.Element {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="relative flex flex-col items-center p-8">
-        <div className="absolute top-8 right-8 text-3xl">
+        <div className="absolute right-8 top-8 text-3xl">
           <Link href="/" className="cursor-pointer">
             🦄
           </Link>
@@ -46,7 +46,7 @@ function AllContent(): JSX.Element {
                   <li key={content.id} className="mb-2 last:mb-0">
                     <div
                       onClick={() => handleClick(content.id)}
-                      className="rounded-md p-4 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
+                      className="rounded-md bg-gray-700 p-4 hover:cursor-pointer hover:bg-gray-600"
                     >
                       <h2 className="text-3xl">{content.versions[0].title}</h2>
                       <p className="text-gray-400">
