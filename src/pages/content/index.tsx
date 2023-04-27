@@ -33,7 +33,7 @@ function AllContent(): JSX.Element {
             🦄
           </Link>
         </div>
-        <div className="mb-6">
+        <div className="mb-6 flex flex-col items-center">
           <h2 className="text-3xl">All Contents</h2>
           <p className="text-gray-400">These are awesome!</p>
         </div>
