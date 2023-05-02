@@ -1,4 +1,4 @@
-import { GetServerSideProps } from "next";
+import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -135,7 +135,7 @@ function Content({ id }: { id: string }): JSX.Element {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { id } = context.query;
 
   return {
@@ -143,6 +143,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       id,
     },
   };
-};
+}
 
 export default Content;
