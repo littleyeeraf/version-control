@@ -16,42 +16,24 @@ function NewContent({ now }: { now: number }): JSX.Element {
 
     if (!titleRef.current || !bodyRef.current) return;
 
-    const title = titleRef.current.value;
-    const body = bodyRef.current.value;
     const datetime = datetimeRef.current?.value;
+    const dt = datetime ? new Date(datetime) : null;
 
     try {
-      if (datetime) {
-        const dt = new Date(datetime);
-        const elapsed = new Date().getTime() - machineTime;
-        const delay = dt.getTime() - (now + elapsed);
+      const elapsed = new Date().getTime() - machineTime;
 
-        await mutate(
-          axios.post("/api/contents", {
-            title: title,
-            body: body,
-            publishedAt: dt,
-            delay: delay,
-          }),
-          {
-            rollbackOnError: true,
-            revalidate: true,
-          }
-        );
-      } else {
-        await mutate(
-          axios.post("/api/contents", {
-            title: title,
-            body: body,
-            publishedAt: new Date(),
-            delay: 0,
-          }),
-          {
-            rollbackOnError: true,
-            revalidate: true,
-          }
-        );
-      }
+      await mutate(
+        axios.post("/api/contents", {
+          title: titleRef.current.value,
+          body: bodyRef.current.value,
+          publishedAt: dt ? dt : new Date(),
+          delay: dt ? dt.getTime() - (now + elapsed) : 0,
+        }),
+        {
+          rollbackOnError: true,
+          revalidate: true,
+        }
+      );
     } catch (err) {
       console.error(err);
     }
