@@ -4,20 +4,23 @@ import { useRouter } from "next/router";
 import useSwr from "swr";
 import { Contents, ContentVersions } from "@prisma/client";
 
+import Loading from "@/components/loading/spin";
+
 async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
 function AllContent(): JSX.Element {
   const router = useRouter();
-  const { data } = useSwr<(Contents & { versions: ContentVersions[] })[]>(
-    "/api/contents",
-    fetcher
-  );
+  const { data, isLoading } = useSwr<
+    (Contents & { versions: ContentVersions[] })[]
+  >("/api/contents", fetcher);
 
   const handleClick = (id: number) => {
     router.push(`/content/${id}`);
   };
+
+  if (isLoading) return <Loading />;
 
   return (
     <>

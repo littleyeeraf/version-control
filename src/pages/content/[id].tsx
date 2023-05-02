@@ -7,16 +7,18 @@ import useSwr from "swr";
 import axios from "axios";
 import { Contents, ContentVersions } from "@prisma/client";
 
+import Loading from "@/components/loading/spin";
+
 async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
 function Content({ id }: { id: string }): JSX.Element {
   const router = useRouter();
-  const { data } = useSwr<Contents & { versions: ContentVersions[] }>(
-    `/api/contents/${id}`,
-    fetcher
-  );
+  const { data, isLoading } = useSwr<
+    Contents & { versions: ContentVersions[] }
+  >(`/api/contents/${id}`, fetcher);
+
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const datetimeRef = useRef<HTMLInputElement>(null);
@@ -41,6 +43,8 @@ function Content({ id }: { id: string }): JSX.Element {
       router.push("/content");
     }
   });
+
+  if (isLoading) return <Loading />;
 
   return (
     <>
