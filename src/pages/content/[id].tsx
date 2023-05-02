@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useState, useRef, useEffect } from "react";
-import useSwr, { mutate } from "swr";
+import useSwr from "swr";
 import axios from "axios";
 import { Contents, ContentVersions } from "@prisma/client";
 
@@ -15,7 +15,7 @@ async function fetcher(url: string) {
 
 function Content({ id }: { id: string }): JSX.Element {
   const router = useRouter();
-  const { data, isLoading } = useSwr<
+  const { data, isLoading, mutate } = useSwr<
     Contents & { versions: ContentVersions[] }
   >(`/api/contents/${id}`, fetcher);
 
@@ -30,12 +30,17 @@ function Content({ id }: { id: string }): JSX.Element {
     if (!titleRef.current || !bodyRef.current) return;
     const datetime = datetimeRef.current?.value;
     try {
-      await axios.put(`/api/contents/${id}`, {
-        title: titleRef.current.value,
-        body: bodyRef.current.value,
-        publishedAt: datetime ? new Date(datetime) : new Date(),
-      });
-      mutate(`/api/contents/${id}`);
+      mutate(
+        await axios.put(`/api/contents/${id}`, {
+          title: titleRef.current.value,
+          body: bodyRef.current.value,
+          publishedAt: datetime ? new Date(datetime) : new Date(),
+        }),
+        {
+          rollbackOnError: true,
+          revalidate: true,
+        }
+      );
     } catch (err) {
       console.error(err);
     }

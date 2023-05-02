@@ -16,12 +16,17 @@ function NewContent(): JSX.Element {
     if (!titleRef.current || !bodyRef.current) return;
     const datetime = datetimeRef.current?.value;
     try {
-      await axios.post("/api/contents", {
-        title: titleRef.current.value,
-        body: bodyRef.current.value,
-        publishedAt: datetime ? new Date(datetime) : new Date(),
-      });
-      mutate("/api/contents");
+      await mutate(
+        axios.post("/api/contents", {
+          title: titleRef.current.value,
+          body: bodyRef.current.value,
+          publishedAt: datetime ? new Date(datetime) : new Date(),
+        }),
+        {
+          rollbackOnError: true,
+          revalidate: true,
+        }
+      );
     } catch (err) {
       console.error(err);
     }
