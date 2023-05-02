@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useState, useRef, useEffect } from "react";
-import useSwr from "swr";
+import useSwr, { mutate } from "swr";
 import axios from "axios";
 import { Contents, ContentVersions } from "@prisma/client";
 
@@ -24,18 +24,21 @@ function Content({ id }: { id: string }): JSX.Element {
   const datetimeRef = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault;
 
     if (!titleRef.current || !bodyRef.current) return;
     const datetime = datetimeRef.current?.value;
-    axios
-      .put(`/api/contents/${id}`, {
+    try {
+      await axios.put(`/api/contents/${id}`, {
         title: titleRef.current.value,
         body: bodyRef.current.value,
         publishedAt: datetime ? new Date(datetime) : new Date(),
-      })
-      .catch((err) => console.error(err));
+      });
+      mutate(`/api/contents/${id}`);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {

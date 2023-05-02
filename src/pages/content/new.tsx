@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { FormEvent, useState, useRef } from "react";
+import { mutate } from "swr";
 import axios from "axios";
 
 function NewContent(): JSX.Element {
@@ -9,18 +10,21 @@ function NewContent(): JSX.Element {
   const datetimeRef = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault;
 
     if (!titleRef.current || !bodyRef.current) return;
     const datetime = datetimeRef.current?.value;
-    axios
-      .post("/api/contents", {
+    try {
+      await axios.post("/api/contents", {
         title: titleRef.current.value,
         body: bodyRef.current.value,
         publishedAt: datetime ? new Date(datetime) : new Date(),
-      })
-      .catch((err) => console.error(err));
+      });
+      mutate("/api/contents");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
