@@ -42,9 +42,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         : res.status(404).end(`Not Found`);
       break;
     case "PUT":
-      const { title, body, publishedAt } = req.body;
-      const uContent = await updateContent(id, title, body, publishedAt);
-      res.status(200).json(uContent);
+      const { title, body, publishedAt, delay } = req.body;
+      setTimeout(async () => {
+        const uContent = await updateContent(id, title, body, publishedAt);
+        res.status(200).json(uContent);
+      }, delay);
       break;
     default:
       res.setHeader("Allow", ["GET", "PUT"]);

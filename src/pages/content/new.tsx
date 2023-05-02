@@ -4,29 +4,54 @@ import { FormEvent, useState, useRef } from "react";
 import { mutate } from "swr";
 import axios from "axios";
 
-function NewContent(): JSX.Element {
+function NewContent({ now }: { now: number }): JSX.Element {
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const datetimeRef = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
+  const machineTime = new Date().getTime();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault;
 
     if (!titleRef.current || !bodyRef.current) return;
+
+    const title = titleRef.current.value;
+    const body = bodyRef.current.value;
     const datetime = datetimeRef.current?.value;
+
     try {
-      await mutate(
-        axios.post("/api/contents", {
-          title: titleRef.current.value,
-          body: bodyRef.current.value,
-          publishedAt: datetime ? new Date(datetime) : new Date(),
-        }),
-        {
-          rollbackOnError: true,
-          revalidate: true,
-        }
-      );
+      if (datetime) {
+        const dt = new Date(datetime);
+        const elapsed = new Date().getTime() - machineTime;
+        const delay = dt.getTime() - (now + elapsed);
+
+        await mutate(
+          axios.post("/api/contents", {
+            title: title,
+            body: body,
+            publishedAt: dt,
+            delay: delay,
+          }),
+          {
+            rollbackOnError: true,
+            revalidate: true,
+          }
+        );
+      } else {
+        await mutate(
+          axios.post("/api/contents", {
+            title: title,
+            body: body,
+            publishedAt: new Date(),
+            delay: 0,
+          }),
+          {
+            rollbackOnError: true,
+            revalidate: true,
+          }
+        );
+      }
     } catch (err) {
       console.error(err);
     }
@@ -107,6 +132,14 @@ function NewContent(): JSX.Element {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps() {
+  return {
+    props: {
+      now: new Date().getTime(),
+    },
+  };
 }
 
 export default NewContent;

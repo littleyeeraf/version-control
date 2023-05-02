@@ -13,7 +13,7 @@ async function fetcher(url: string) {
   return fetch(url).then((res) => res.json());
 }
 
-function Content({ id }: { id: string }): JSX.Element {
+function Content({ id, now }: { id: string; now: number }): JSX.Element {
   const router = useRouter();
   const { data, isLoading, mutate } = useSwr<
     Contents & { versions: ContentVersions[] }
@@ -23,24 +23,49 @@ function Content({ id }: { id: string }): JSX.Element {
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const datetimeRef = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
+  const machineTime = new Date().getTime();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault;
 
     if (!titleRef.current || !bodyRef.current) return;
+
+    const title = titleRef.current.value;
+    const body = bodyRef.current.value;
     const datetime = datetimeRef.current?.value;
+
     try {
-      mutate(
-        await axios.put(`/api/contents/${id}`, {
-          title: titleRef.current.value,
-          body: bodyRef.current.value,
-          publishedAt: datetime ? new Date(datetime) : new Date(),
-        }),
-        {
-          rollbackOnError: true,
-          revalidate: true,
-        }
-      );
+      if (datetime) {
+        const dt = new Date(datetime);
+        const elapsed = new Date().getTime() - machineTime;
+        const delay = dt.getTime() - (now + elapsed);
+
+        await mutate(
+          axios.put(`/api/contents/${id}`, {
+            title: title,
+            body: body,
+            publishedAt: dt,
+            delay: delay,
+          }),
+          {
+            rollbackOnError: true,
+            revalidate: true,
+          }
+        );
+      } else {
+        await mutate(
+          axios.put(`/api/contents/${id}`, {
+            title: title,
+            body: body,
+            publishedAt: new Date(),
+            delay: 0,
+          }),
+          {
+            rollbackOnError: true,
+            revalidate: true,
+          }
+        );
+      }
     } catch (err) {
       console.error(err);
     }
@@ -141,6 +166,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       id,
+      now: new Date().getTime(),
     },
   };
 }

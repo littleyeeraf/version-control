@@ -34,9 +34,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(200).json(contents);
       break;
     case "POST":
-      const { title, body, publishedAt } = req.body;
-      const content = await createContent(title, body, publishedAt);
-      res.status(201).json(content);
+      const { title, body, publishedAt, delay } = req.body;
+      setTimeout(async () => {
+        const content = await createContent(title, body, publishedAt);
+        res.status(201).json(content);
+      }, delay);
       break;
     default:
       res.setHeader("Allow", ["GET", "POST"]);
