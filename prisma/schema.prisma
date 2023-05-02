@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Contents {
-  id                Int               @id @default(autoincrement())
-  versions          ContentVersions[]
+  id       Int               @id @default(autoincrement())
+  versions ContentVersions[]
 }
 
 model ContentVersions {
@@ -18,5 +18,6 @@ model ContentVersions {
   contentId   Int
   title       String   @db.VarChar(255)
   body        String
+  published   Boolean
   publishedAt DateTime @default(now())
 }

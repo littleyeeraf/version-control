@@ -6,7 +6,14 @@ async function createContent(title: string, body: string, publishedAt: Date) {
   return await prisma.contents.create({
     data: {
       versions: {
-        create: [{ title: title, body: body, publishedAt: publishedAt }],
+        create: [
+          {
+            title: title,
+            body: body,
+            published: true,
+            publishedAt: publishedAt,
+          },
+        ],
       },
     },
   });
@@ -16,7 +23,7 @@ async function getContent() {
   return await prisma.contents.findMany({
     include: {
       versions: {
-        where: { publishedAt: { lte: new Date() } },
+        where: { published: true },
         orderBy: { id: "desc" },
         take: 1,
       },

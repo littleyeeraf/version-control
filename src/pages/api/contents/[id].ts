@@ -7,7 +7,7 @@ async function getContentByID(id: number) {
     where: { id: id },
     include: {
       versions: {
-        where: { publishedAt: { lte: new Date() } },
+        where: { published: true },
         orderBy: { id: "desc" },
       },
     },
@@ -20,14 +20,28 @@ async function updateContent(
   body: string,
   publishedAt: Date
 ) {
-  return await prisma.contents.update({
-    where: { id: id },
-    data: {
-      versions: {
-        create: [{ title: title, body: body, publishedAt: publishedAt }],
-      },
-    },
-  });
+  return await prisma.contentVersions
+    .updateMany({
+      where: { contentId: id },
+      data: { published: false },
+    })
+    .then(() =>
+      prisma.contents.update({
+        where: { id: id },
+        data: {
+          versions: {
+            create: [
+              {
+                title: title,
+                body: body,
+                published: true,
+                publishedAt: publishedAt,
+              },
+            ],
+          },
+        },
+      })
+    );
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
