@@ -22,10 +22,13 @@ function Content({ id, now }: { id: string; now: number }): JSX.Element {
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const datetimeRef = useRef<HTMLInputElement>(null);
-  const [checked, setChecked] = useState<boolean>(false);
+  const idRef = useRef<number>();
+  const [isSchedule, setIsScheduled] = useState<boolean>(false);
+  const [isRollback, setIsRollback] = useState<boolean>(false);
+  const [selectedVersion, setSelectedVersion] = useState<number>();
   const machineTime = new Date().getTime();
 
-  const handleSubmit = async (e: FormEvent) => {
+  const updateContent = async (e: FormEvent) => {
     e.preventDefault;
 
     if (!titleRef.current || !bodyRef.current) return;
@@ -53,11 +56,41 @@ function Content({ id, now }: { id: string; now: number }): JSX.Element {
     }
   };
 
-  useEffect(() => {
-    if (data && data.versions.length === 0) {
-      router.push("/content");
+  const updateContentVersion = async (e: FormEvent) => {
+    e.preventDefault;
+
+    if (!idRef.current) return;
+
+    try {
+      await mutate(
+        axios.patch(`/api/contents/${id}`, {
+          id: idRef.current,
+        }),
+        {
+          rollbackOnError: true,
+          revalidate: true,
+        }
+      );
+    } catch (err) {
+      console.error(err);
     }
-  });
+  };
+
+  useEffect(() => {
+    if (data && data.versions) {
+      if (data.versions.length === 0) {
+        router.push("/content");
+        return;
+      }
+      for (let i = 0; i < data.versions.length; i++) {
+        if (data.versions[i].published) {
+          setSelectedVersion(i);
+          idRef.current = data.versions[i].id;
+          return;
+        }
+      }
+    }
+  }, [data, router]);
 
   if (isLoading) return <Loading />;
 
@@ -75,9 +108,50 @@ function Content({ id, now }: { id: string; now: number }): JSX.Element {
             🦄
           </Link>
         </div>
-        {data && (
+        {data && data.versions && selectedVersion !== undefined && (
           <div className="mb-6 w-96">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={updateContentVersion} className="mb-6">
+              <div className="mb-2">
+                <input
+                  id="rollback-checkbox"
+                  type="checkbox"
+                  checked={isRollback}
+                  onChange={() => setIsRollback(!isRollback)}
+                  className="mr-2 hover:cursor-pointer"
+                />
+                <label htmlFor="rollback-checkbox">Rollback Version</label>
+              </div>
+              <div className="mb-2">
+                <select
+                  value={selectedVersion}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    setSelectedVersion(value);
+                    idRef.current = data.versions[value].id;
+                  }}
+                  disabled={!isRollback}
+                  required
+                  className="w-full rounded-sm p-1 disabled:cursor-not-allowed"
+                >
+                  {data.versions.map((version, index) => (
+                    <option key={index} value={index}>
+                      version: {index + 1}
+                      {version.published && "*"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex content-center">
+                <button
+                  type="submit"
+                  className="w-full rounded-sm bg-gray-700 p-1 hover:bg-gray-600"
+                >
+                  Revert
+                </button>
+              </div>
+            </form>
+
+            <form onSubmit={updateContent}>
               <div className="mb-2">
                 <label htmlFor="title">Title</label>
                 <br />
@@ -85,7 +159,8 @@ function Content({ id, now }: { id: string; now: number }): JSX.Element {
                   ref={titleRef}
                   id="title"
                   type="text"
-                  defaultValue={data.versions[0]?.title}
+                  key={selectedVersion}
+                  defaultValue={data.versions[selectedVersion].title}
                   autoComplete="off"
                   required
                   className="w-full rounded-sm p-1"
@@ -97,7 +172,8 @@ function Content({ id, now }: { id: string; now: number }): JSX.Element {
                 <textarea
                   ref={bodyRef}
                   id="body"
-                  defaultValue={data.versions[0]?.body}
+                  key={selectedVersion}
+                  defaultValue={data.versions[selectedVersion].body}
                   required
                   className="w-full rounded-sm p-1"
                 ></textarea>
@@ -106,8 +182,8 @@ function Content({ id, now }: { id: string; now: number }): JSX.Element {
                 <input
                   id="schedule-checkbox"
                   type="checkbox"
-                  checked={checked}
-                  onChange={() => setChecked(!checked)}
+                  checked={isSchedule}
+                  onChange={() => setIsScheduled(!isSchedule)}
                   className="mr-2 hover:cursor-pointer"
                 />
                 <label htmlFor="schedule-checkbox">Schedule Publish</label>
@@ -116,7 +192,7 @@ function Content({ id, now }: { id: string; now: number }): JSX.Element {
                 <input
                   ref={datetimeRef}
                   type="datetime-local"
-                  disabled={!checked}
+                  disabled={!isSchedule}
                   required
                   className="w-full rounded-sm p-1 disabled:cursor-not-allowed"
                 />
